@@ -34,7 +34,6 @@ import NotePencil from "../../../../assets/images/NotePencil.png";
 import { Box } from "@mui/material";
 import getFilesCount from "../../../../api/getFilesCount";
 import postUploadFiles from "../../../../api/postUploadFiles";
-import getFiles from "../../../../api/getFiles";
 import moment from "moment";
 import { useModal } from "../../../../context/modal-context";
 import StorageFullModal from "./StorageFullModal";
@@ -54,6 +53,11 @@ import { PieChart } from "react-minimal-pie-chart";
 import { getProfile } from "../../../../store/slice/mainSlice";
 import FolderRenameModal from "../../../../components/FolderRenameModal";
 import styled from "styled-components";
+import { getUser } from "../../../../networks/user";
+import { getFiles } from "../../../../networks/getFiles";
+import { getFolders } from "../../../../networks/folders";
+
+
 
 const Column = styled.div`
   display: flex;
@@ -114,6 +118,9 @@ export default function Home() {
   const token = useSelector((state) => state.reducer.auth.token);
   const user = useSelector((state) => state.reducer.auth.user);
   const [deleteFolder] = useDeleteFolderMutation();
+  const [userData, setUserData] = useState(null)
+  const [files, setFiles] = useState([])
+  const [foldersData, setFoldersData] = useState([])
   const {
     data: myProfile,
     isLoading,
@@ -129,56 +136,62 @@ export default function Home() {
   const { data: folders } = useGetFoldersQuery();
   const allFolders = folders?.results ? folders.results : [];
 
-  useEffect(() => {
-    if (isSuccess && !isLoading && myProfile.results) {
-      const user = myProfile.results[0];
-      if (user.name && user.verification_period) {
-        dispatch(getProfile(user));
-      } else {
-        navigate("/create-profile");
-      }
+
+  const getUserInfo = async () => {
+    const data = await getUser()
+    if (data.success) return setUserData(data.user)
+    return alert("Something went wrong")
+  }
+
+
+  const getFilesInfo = async () => {
+    const data = await getFiles()
+    if (data.success) {
+      setFiles(data.files)
+      data.files.map(file => {
+        switch (file.ext) {
+          case 'pdf':
+            setpdfcount(pdfcount + 1)
+            break;
+          case 'png':
+            setpngcount(pngcount + 1)
+            break;
+          case 'jpeg' || 'jpg':
+            setJpegCount(jpegCount + 1)
+            break;
+
+          default:
+            setOtherFilesCount(otherFilesCount + 1)
+            break;
+        }
+      })
+      return
     }
-  }, [isLoading, isSuccess]);
+    return alert("Something went wrong")
+  }
+  const getFoldersInfo = async () => {
+    const data = await getFolders()
+    if (data.success) {
+      setFoldersData(data.folders)
+
+      return
+    }
+    return alert("Something went wrong")
+  }
+
+  useEffect(() => {
+    getUserInfo()
+    getFilesInfo()
+    getFoldersInfo()
+  }, []);
 
   const HandleCreateFolder = () => {
-    createFolder(field)
-      .unwrap()
-      .then(() => {
-        setopen(false);
-        setfield("");
-      })
-      .catch(() => {
-        setopen(false);
-        setfield("");
-      });
+    console.log(field)
+
   };
 
   useEffect(() => {
-    getFilesCount(token).then((response) => {
-      response.result.map((item) => {
-        if (item.extension === "application/pdf") {
-          setpdfcount(item.count);
-        } else if (item.extension === "image/png") {
-          setpngcount(item.count);
-        } else if (item.extension === "image/jpeg") {
-          setJpegCount(item.count);
-        }
-      });
-      setOtherFilesCount(
-        response.result.reduce((total, current) => {
-          if (
-            current.extension === "application/pdf" ||
-            current.extension === "image/png" ||
-            current.extension === "image/jpeg"
-          )
-            return total;
-          return total ? total + current.count : current.count;
-        }, 0)
-      );
-    });
-    getFiles(token).then((response) => {
-      setFilesData(response.results);
-    });
+
   }, []);
   const style = {
     position: "absolute",
@@ -193,8 +206,8 @@ export default function Home() {
     boxShadow: 30,
     p: "45px 15px 25px 15px",
   };
-  const Folders = allFolders.slice(0, 5);
-  const ThreeFilesRecords = FilesData.slice(0, 3);
+  const Folders = allFolders?.slice(0, 5);
+  const ThreeFilesRecords = files?.slice(0, 3);
   const fileCountData = [
     { color: "#DFF9EC", count: pdfcount ? pdfcount : 0, type: "PDF Files" },
     { color: "#FDF1CD", count: pngcount ? pngcount : 0, type: "PNG Files" },
@@ -225,7 +238,6 @@ export default function Home() {
     toggleRenameModal(true);
   };
 
-  console.log("user...", user);
   return (
     <>
       <Row
@@ -239,7 +251,7 @@ export default function Home() {
         <div className="welcome_flex">
           <Paragraph color="#000">Welcome, 👋</Paragraph>
           <Title className="title">
-            {user?.name ? user?.name : "Antor P."}
+            {userData?.name ? userData?.name : "Antor P."}
           </Title>
         </div>
 
@@ -285,7 +297,7 @@ export default function Home() {
             <IoNotificationsOutline size={20} />
           </IconButton>
 
-          <Profile user={user} />
+          <Profile user={userData} />
         </Row>
       </Row>
 
@@ -304,14 +316,32 @@ export default function Home() {
             width="100%"
             gap="10px"
           >
-            {fileCountData.map((value, index) => (
-              <FileCount
-                key={index}
-                color={value.color}
-                count={value.count}
-                type={value.type}
-              />
-            ))}
+
+            <FileCount
+              key={1}
+              color={"#DFF9EC"}
+              count={pdfcount}
+              type={"PDF Files"}
+            />
+            <FileCount
+              key={2}
+              color={"#FDF1CD"}
+              count={pngcount}
+              type={"PNG Files"}
+            />
+            <FileCount
+              key={3}
+              color={"#FEEBE1"}
+              count={jpegCount}
+              type={"JPEG Files"}
+            />
+            <FileCount
+              key={4}
+              color={"#E3EEFF"}
+              count={otherFilesCount}
+              type={"Other Files"}
+            />
+
           </Row>
 
           <Row
@@ -332,7 +362,7 @@ export default function Home() {
                 height="auto"
                 sx={{ display: "flex", flexWrap: "wrap" }}
               >
-                {Folders.map((item, index) => {
+                {foldersData?.map((item, index) => {
                   return (
                     <div style={{ position: "relative" }}>
                       <div
@@ -365,8 +395,8 @@ export default function Home() {
                               }}
                             >
                               <img
-                                width="20px"
-                                height="20px"
+                                width="32px"
+                                height="32px"
                                 src={folder}
                                 style={{
                                   paddingTop: "10px",
@@ -376,11 +406,9 @@ export default function Home() {
                             </div>
                           </div>
                           <Title fontSize="10px" margin="10px 0px 0px 3px">
-                            {item.name}
+                            {item.foldername}
                           </Title>
-                          <Paragraph fontSize="12px" margin="3px 0px 0px 3px">
-                            {item.files.length} file
-                          </Paragraph>
+
                         </FolderContainer>
                       </div>
                       <OptionsMenu
@@ -405,7 +433,7 @@ export default function Home() {
                               deleteFolder(item.id);
                             },
                           },
-                          { text: "Make a Copy", onClick: () => {} },
+                          { text: "Make a Copy", onClick: () => { } },
                         ]}
                         position="absolute"
                       />
@@ -413,37 +441,7 @@ export default function Home() {
                   );
                 })}
               </Box>
-              {/* <Box width='100%' height='auto' sx={{ display: 'flex' }}>
-                {TwoRecords.map((item) => {
-                  return (
-                    <FolderContainer
-                      width='130px'
-                      height='95px'
-                      flexDirection='column'
-                      justifyContent='flex-start'
-                      alignItems='flex-start'
-                      padding='10px'
-                      margin='4px 0px 0px 15px'
-                      borderRadius='7px'
-                    >
-                      <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
-                        <div style={{
-                          width: '40px',
-                          height: '40px',
-                          borderRadius: '50%', backgroundColor: '#ffeeea'
-                        }} >
-                          <img width="20px" height="20px" src={folder} style={{
-                            paddingTop: '10px', paddingLeft: '10px'
-                          }} />
-                        </div>
-                        <IoEllipsisHorizontalOutline color="rgba(0, 0, 0, 0.4)" />
-                      </div>
-                      <Title fontSize='10px' margin='10px 0px 0px 3px'>{item.name}</Title>
-                      <Paragraph fontSize='12px' margin='3px 0px 0px 3px'>{item.files.length} file</Paragraph>
-                    </FolderContainer>
-                  )
-                })}
-              </Box> */}
+
               <NewFolder onChange="" setopen={setopen} />
             </HomeContainer>
 
@@ -453,7 +451,7 @@ export default function Home() {
               width="40%"
               height="349px"
             >
-              {ThreeFilesRecords.map((item, i) => {
+              {ThreeFilesRecords?.map((item, i) => {
                 return (
                   <div key={i}>
                     <FolderContainer
@@ -464,7 +462,7 @@ export default function Home() {
                       alignItems="flex-start"
                       padding="10px"
                       borderRadius="0px"
-                      onClick={() => window.open(item.file)}
+                      onClick={() => window.open(item?.file)}
                     >
                       <div
                         style={{
@@ -501,11 +499,11 @@ export default function Home() {
                             }}
                           >
                             <Title fontSize="13px">
-                              {truncateString(item.name, 20)}
+                              {truncateString(item?.name, 20)}
                             </Title>
                             <Paragraph fontSize="13px">
                               Uploaded on :{" "}
-                              {moment(item.uploaded_on).format("L")}{" "}
+                              {moment(item?.created_at).format("L")}{" "}
                             </Paragraph>
                           </div>
                         </div>
@@ -665,10 +663,9 @@ export default function Home() {
                 },
                 {
                   title: "Free Space",
-                  value: `${
-                    storage &&
+                  value: `${storage &&
                     storage.results[0].storage - storage.results[0].storage_left
-                  }`,
+                    }`,
                   color: "#1877f2",
                 },
               ]}

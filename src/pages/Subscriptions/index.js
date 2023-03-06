@@ -5,11 +5,14 @@ import { Plan, Switch, SwitchButton } from "../../components/Subscriptions";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { useGetSubscriptionsAndPackagesQuery } from "../../store/slice/api";
 import { useSelector } from "react-redux";
+import { getPlans } from "../../networks/plans";
 
 export default function Subscriptions() {
   const [monthly, setMonthly] = useState(true);
   const [interval, setInterval] = useState("month");
   const user = useSelector((state) => state.reducer.auth.user);
+
+  const [plans, setPlans] = useState([])
 
   const {
     data: subscriptionsAndPackagesApiResponse,
@@ -35,18 +38,18 @@ export default function Subscriptions() {
         order: snp.nickname.includes("BASIC")
           ? 1
           : snp.nickname.includes("STANDARD")
-          ? 2
-          : 3,
+            ? 2
+            : 3,
         color: snp.nickname.includes("BASIC")
           ? "#FBBC05"
           : snp.nickname.includes("STANDARD")
-          ? "#A7D170"
-          : "#F19ECE",
+            ? "#A7D170"
+            : "#F19ECE",
         availableFeatureCount: snp.nickname.includes("BASIC")
           ? 2
           : snp.nickname.includes("STANDARD")
-          ? 3
-          : 4,
+            ? 3
+            : 4,
       }))
       .sort((a, b) => a.order - b.order);
   }, [subscriptionsAndPackagesApiResponse, interval, monthly]);
@@ -105,54 +108,61 @@ export default function Subscriptions() {
     }
   }, [user]);
 
+  const getSubscriptionRecords = async () => {
+    const data = await getPlans()
+    if (data.success) setPlans(data.result)
+  }
+
+
+  useEffect(() => {
+    getSubscriptionRecords()
+  }, [])
+
+
   return (
     <Page justifyContent="flex-start">
       <Container width="1227px" margin="69px auto" justifyContent="flex-start">
         <Title fontWeight="700" margin="46px auto">
           Subscription & Packages
         </Title>
-        {isFetchingSubscriptionsAndPackages ? (
-          <LoadingSpinner />
-        ) : errorFetchingSubscriptionsAndPackages ? (
-          <></>
-        ) : (
-          <>
-            <Switch>
-              <SwitchButton
-                active={monthly}
-                onClick={() => {
-                  setMonthly(true);
-                  setInterval("month");
-                }}
-              >
-                <p style={{ margin: "auto" }}>Monthly</p>
-              </SwitchButton>
-              <SwitchButton
-                right
-                active={!monthly}
-                onClick={() => {
-                  setMonthly(false);
-                  setInterval("year");
-                }}
-              >
-                <p style={{ margin: "auto" }}>Yearly</p>
-              </SwitchButton>
-            </Switch>
 
-            <Row justifyContent="space-between" width="1005px">
-              {packages.map((plan, index) => (
-                <Plan
-                  key={index}
-                  plan={plan}
-                  videos={videos}
-                  storages={storages}
-                  interval={interval}
-                  monthly={monthly}
-                />
-              ))}
-            </Row>
-          </>
-        )}
+        <>
+          <Switch>
+            <SwitchButton
+              active={monthly}
+              onClick={() => {
+                setMonthly(true);
+                setInterval("month");
+              }}
+            >
+              <p style={{ margin: "auto" }}>Monthly</p>
+            </SwitchButton>
+            <SwitchButton
+              right
+              active={!monthly}
+              onClick={() => {
+                setMonthly(false);
+                setInterval("year");
+              }}
+            >
+              <p style={{ margin: "auto" }}>Yearly</p>
+            </SwitchButton>
+          </Switch>
+
+          <Row justifyContent="space-between" width="1005px">
+            {plans.map((plan, index) => (
+              <Plan
+                key={index}
+                plan={{ ...plan, unit_price: plan.price }}
+                videos={videos}
+                storages={storages}
+                interval={interval}
+                monthly={monthly}
+              />
+            ))}
+          </Row>
+        </>
+
         <Back />
       </Container>
     </Page>

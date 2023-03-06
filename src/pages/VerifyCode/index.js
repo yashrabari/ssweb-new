@@ -10,154 +10,46 @@ import {
   Title,
 } from "../../components/common";
 import ReactCodeInput from "react-code-input";
-import { useDispatch, useSelector } from "react-redux";
-import { login, Twofactorverification } from "../../store/actions/auth";
-import {
-  post2fa,
-  postResetPasswordResend,
-  postResetPasswordVerify,
-} from "../../api";
+
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  passwordReseted,
-  requestResetPassword,
-  setResetPasswordError,
-} from "../../store/slice/mainSlice";
-import {
-  useSetNewPasswordMutation,
-  useVerifyOtpMutation,
-} from "../../store/slice/api";
+import { useNavigate, useLocation } from "react-router-dom";
+
 import "./index.css";
 
+import { verifyOtp } from "../../networks/auth";
+import { useContext } from "react";
+import { AuthContext } from "../../context/authContext";
+
+
 export default function VerifyCode({ twofactor, imageSrc, title }) {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const email = useSelector((state) => state.reducer.resetPassword.email);
-  const signUp = useSelector((state) => state.reducer.auth.signUp);
+  const { loginFunction } = useContext(AuthContext)
 
+  const location = useLocation()
   const [code, setCode] = useState("");
   const [error, seterror] = useState("");
+  const [userId, setUserId] = useState(null)
 
-  const [verifyOtp] = useVerifyOtpMutation();
 
   const handleResend = async () => {
-    dispatch(requestResetPassword());
-    try {
-      await postResetPasswordResend(email);
-      dispatch(passwordReseted());
-    } catch (error) {
-      dispatch(setResetPasswordError(error));
-    }
+
+
   };
-  const loggedIn = useSelector((state) => state.reducer.auth.loggedIn);
   useEffect(() => {
-    if (loggedIn) {
-      navigate("/home");
-    }
-  }, [loggedIn, navigate]);
+    setUserId(location.state.userId)
 
-  // const handleVerify = async () => {
-  //   if (newPassword !== confirmNewPassword) {
-  //     setConfirmPasswordError(true)
-  //     return
-  //   }
+  }, [navigate]);
 
-  //   // if (twofactor) {
-  //     setConfirmPasswordError(false)
 
-  //     verifyOtp(code).unwrap().then((response) => {
-  //       if (response.token) {
-  //         dispatch(Twofactorverification(response));
-  //         if (signUp) {
-  //           navigate('/create-profile')
-  //         } else {
-  //           dispatch(login({
-  //             user: response
-  //           }))
-  //           navigate('/home')
-  //         }
-  //       }
-  //       else {
-  //         seterror(response.message);
-  //       }
-
-  //     }).catch((error) => {
-  //       console.log('err', error);
-  //     })
-
-  //     // post2fa(code).then((response) => {
-  //     //   if (response.token) {
-  //     //     dispatch(Twofactorverification(response));
-  //     //     if (signUp) {
-  //     //       navigate('/create-profile')
-  //     //     } else {
-  //     //       dispatch(login({
-  //     //         user: response
-  //     //       }))
-  //     //       navigate('/home')
-  //     //     }
-  //     //   }
-  //     //   else {
-  //     //     seterror(response.message);
-  //     //   }
-  //     // })
-  //   // }
-
-  //   if (twofactor === false) {
-
-  //     addNewPassword(confirmNewPassword).unwrap().then((data) => {
-  //       if (data.data.message == "Successfully resetted user password.") {
-  //         navigate("/login")
-  //       } else {
-  //         dispatch(setResetPasswordError(error.message))
-  //         setResetPasswordScreen(false)
-  //         navigate("/verify-forgot-password")
-  //       }
-
-  //     }).catch((error) => {
-  //       console.log('err dodo', error);
-  //     })
-
-  //     // const data = await postResetPasswordVerify(email, code, confirmNewPassword);
-  //     // console.log('data...', data);
-  //     // console.log(data.data.message)
-  //     // if (data.data.message == "Successfully resetted user password.") {
-  //     //   navigate("/login")
-  //     // } else {
-  //     //   dispatch(setResetPasswordError(error.message))
-  //     //   setResetPasswordScreen(false)
-  //     //   navigate("/verify-forgot-password")
-  //     // }
-  //   }
-  // }
-
-  const handleVerifyOtp = () => {
-    if (twofactor) {
-      post2fa(code).then((response) => {
-        if (response.token) {
-          dispatch(Twofactorverification(response));
-          dispatch(login({ user: response }));
-          navigate("/home");
-        } else {
-          seterror(response.message);
-        }
-      });
-    } else {
-      verifyOtp({ code, email })
-        .unwrap()
-        .then((response) => {
-          // changes
-          if (response.message) {
-            navigate("/change-password");
-          } else {
-            seterror(response.message);
-          }
-        })
-        .catch((error) => {
-          console.log("error", error);
-        });
+  const handleVerifyOtp = async () => {
+    try {
+      const res = await verifyOtp({ id: userId, otp: code })
+      if (!res.success) return seterror(res.message)
+      loginFunction(res.token)
+      navigate('/home')
+    } catch (err) {
+      seterror(err)
     }
   };
 

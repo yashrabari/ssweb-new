@@ -43,6 +43,11 @@ import { useLoginWithAppleMutation } from "../../store/slice/api";
 import { useGoogleLogin } from "@react-oauth/google";
 import useWindowSize from "./../../utils/hook/useWindowSize";
 
+
+import { loginRequest } from '../../networks/auth'
+import { useContext } from "react";
+import { AuthContext } from "../../context/authContext";
+
 const Image = styled.img`
   @media (max-width: 900px) {
     width: 20px;
@@ -99,6 +104,7 @@ export default function Login() {
   const [loginWithApple] = useLoginWithAppleMutation();
   const navigate = useNavigate();
 
+  const { loginFunction } = useContext(AuthContext)
   // useEffect(() => {
   //   function start() {
   //     gapi.client.init({
@@ -117,16 +123,23 @@ export default function Login() {
 
   const [remember, setRemember] = useState(false);
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    postLogin(email, password)
-      .then((response) => {
-        navigate("/2fa");
+    const response = await loginRequest({ email, password })
+    if (!response.success) return seterror({ non_field_errors: [response.message] })
+    if (response.success && response.is2Fa) {
+      console.log("we are here")
+      return navigate('/2fa', {
+        state: {
+          userId: response.userId
+        }
       })
-      .catch((error) => {
-        console.log("error: ", error);
-        seterror(error.response.data);
-      });
+    }
+    if (response.success && !response.is2Fa) {
+      loginFunction(response.token)
+      navigate('/home')
+      return
+    }
   };
 
   const handleForgotPassword = async () => {
@@ -152,7 +165,7 @@ export default function Login() {
           err.response
             ? err.response.data
               ? err.response.data.non_field_errors ??
-                JSON.stringify(err.response.data)
+              JSON.stringify(err.response.data)
               : JSON.stringify(err.response)
             : err.message
         );
@@ -191,7 +204,7 @@ export default function Login() {
           err.response
             ? err.response.data
               ? err.response.data.non_field_errors ??
-                JSON.stringify(err.response.data)
+              JSON.stringify(err.response.data)
               : JSON.stringify(err.response)
             : err.message
         );

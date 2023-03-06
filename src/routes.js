@@ -39,67 +39,94 @@ const routes = [
   {
     path: "/",
     exact: true,
-    element: <Landing />
+    element: <Landing />,
+    protected: false
   },
   {
     path: "/welcome",
-    element: <Welcome />
+    element: <Welcome />,
+    protected: false
   },
   {
     path: "/login",
-    element: <Login />
+    element: <Login />,
+    protected: false
   },
   {
     path: "/signup",
-    element: <Signup />
+    element: <Signup />,
+    protected: false
   },
   {
     path: "/home",
     element: <Layout />,
+    protected: true,
     routes: [
       {
         index: true,
-        element: <Home />
+        element: <Home />,
+        protected: true,
+
       },
       {
         path: "my-buddies",
-        element: <MyBuddies />
+        element: <MyBuddies />,
+        protected: true,
+
       },
       {
         path: "about",
-        element: <About />
+        element: <About />,
+        protected: true,
+
       },
       {
         path: "documents",
-        element: <Documents />
+        element: <Documents />,
+        protected: true,
+
       },
       {
         path: "shared",
-        element: <Shared />
+        element: <Shared />,
+        protected: true,
+
       },
       {
         path: "documents/folder/:id",
-        element: <Folder />
+        element: <Folder />,
+        protected: true,
+
       },
       {
         path: "notifications",
-        element: <Notifications />
+        element: <Notifications />,
+        protected: true,
+
       },
       {
         path: "transactions/payment-history",
-        element: <TransactionsPaymentHistory />
+        element: <TransactionsPaymentHistory />,
+        protected: true,
+
       },
       {
         path: "transactions",
-        element: <Transactions />
+        element: <Transactions />,
+        protected: true,
+
       },
       {
         path: "transactions/addPaymentMethod",
-        element: <PaymentMethod />
+        element: <PaymentMethod />,
+        protected: true,
+
       },
       {
         path: "send/feedback",
-        element: <SendFeedback />
+        element: <SendFeedback />,
+        protected: true,
+
       },
       // {
       //   path: "/transactions/subscriptions",
@@ -107,7 +134,9 @@ const routes = [
       // },
       {
         path: "edit-profile",
-        element: <EditProfile />
+        element: <EditProfile />,
+        protected: true,
+
       },
     ]
   },
@@ -135,18 +164,26 @@ const routes = [
   },
   {
     path: "/create-profile",
-    element: <CreateProfile />
+    element: <CreateProfile />,
+    protected: true,
+
   },
   {
     path: "/subscriptions",
+    protected: true,
+
     routes: [
       {
         index: true,
-        element: <Subscriptions />
+        element: <Subscriptions />,
+        protected: true,
+
       },
       {
         path: "payment",
-        element: <Elements stripe={stripePromise}><Payment /></Elements>
+        element: <Elements stripe={stripePromise}><Payment /></Elements>,
+        protected: true,
+
       }
     ]
   },
@@ -178,7 +215,7 @@ const routes = [
     path: "/products",
     element: <Products />
   },
- 
+
 ]
 
 export default routes

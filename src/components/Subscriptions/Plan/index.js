@@ -26,27 +26,27 @@ export default function Plan({ plan: { id: planId, nickname: name, unit_amount, 
     return () => setCoupon('')
   }, [unit_amount])
 
-  const subscribe = useMemo(() => {
-    if (user && user.subscription) {
-      return user.subscription.items.find((item) => {
-        if (item.plan.nickname.includes('package') && item.plan.id === planId) {
-          return item
-        } else {
-          return
-        }
-      })
-    }
-  }, [user, interval, monthly])
+  // const subscribe = useMemo(() => {
+  //   if (user && user.subscription) {
+  //     return user.subscription.items.find((item) => {
+  //       if (item.plan.nickname.includes('package') && item.plan.id === planId) {
+  //         return item
+  //       } else {
+  //         return
+  //       }
+  //     })
+  //   }
+  // }, [user, interval, monthly])
 
-  const swapId = useMemo(() => {
-    if (user.subscription) {
-      return user.subscription.items.find((id) => {
-        if (id.plan.nickname.includes('package')) {
-          return id
-        }
-      })
-    }
-  }, [user, interval, monthly])
+  // const swapId = useMemo(() => {
+  //   if (user.subscription) {
+  //     return user.subscription.items.find((id) => {
+  //       if (id.plan.nickname.includes('package')) {
+  //         return id
+  //       }
+  //     })
+  //   }
+  // }, [user, interval, monthly])
 
   const checkCoupon = (c) => {
     setCoupon(c)
@@ -61,7 +61,8 @@ export default function Plan({ plan: { id: planId, nickname: name, unit_amount, 
   }
 
   const choosePlan = () => {
-    navigate('/subscriptions/payment', { state: { plan: { id: planId, nickname: name, unit_amount: price, currency, color, availableFeatureCount, swapId: swapId ? swapId.id : '' } } })
+    navigate('/subscriptions/payment', { state: { plan: { id: planId, nickname: name, unit_amount: price, currency, color, availableFeatureCount, } } })
+    // navigate('/subscriptions/payment', { state: { plan: { id: planId, nickname: name, unit_amount: price, currency, color, availableFeatureCount, swapId: swapId ? swapId.id : '' } } })
   }
 
   const choosePlanSubscried = () => {
@@ -83,19 +84,33 @@ export default function Plan({ plan: { id: planId, nickname: name, unit_amount, 
           currency,
           color,
           availableFeatureCount,
-          swapId: swapId ? swapId.id : ''
         },
         storage,
         video,
       }
     })
+    // navigate('/subscriptions/payment', {
+    //   state: {
+    //     plan: {
+    //       id: planId,
+    //       nickname: name,
+    //       unit_amount: price,
+    //       currency,
+    //       color,
+    //       availableFeatureCount,
+    //       swapId: swapId ? swapId.id : ''
+    //     },
+    //     storage,
+    //     video,
+    //   }
+    // })
   }
 
   return (
     <Container style={{ height: height ? height : '606px' }}>
       <PlanHeader>
         <PlanName color={color}>{name}</PlanName>
-        <PlanPrice>{currency}{price}</PlanPrice>
+        <PlanPrice>${price}</PlanPrice>
         <Paragraph width="" color="#000">For single membership</Paragraph>
       </PlanHeader>
 
@@ -108,11 +123,19 @@ export default function Plan({ plan: { id: planId, nickname: name, unit_amount, 
         ))}
       </PlanFeatures>
 
-      {!payment &&
+      {/* {!payment &&
         <>
           <Coupon placeholder="Coupon Code" value={coupon} onChange={(e) => checkCoupon(e.target.value)} />
           {!subscribe && <PlanButton onClick={choosePlan}>Choose plan</PlanButton>}
           {subscribe && <PlanButton background='#00A652' color='#fff' border='none' onClick={choosePlanSubscried}>Subscribed</PlanButton>}
+          <Paragraph bold link color="#00A652" onClick={viewAddon}>View Add-ons</Paragraph>
+        </>
+      } */}
+      {!payment &&
+        <>
+          <Coupon placeholder="Coupon Code" value={coupon} onChange={(e) => checkCoupon(e.target.value)} />
+          <PlanButton onClick={choosePlan}>Choose plan</PlanButton>
+          <PlanButton background='#00A652' color='#fff' border='none' onClick={choosePlanSubscried}>Subscribed</PlanButton>
           <Paragraph bold link color="#00A652" onClick={viewAddon}>View Add-ons</Paragraph>
         </>
       }

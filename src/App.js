@@ -6,6 +6,9 @@ import { store } from "./store";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Box } from "@mui/material";
 import useWindowSize from "./utils/hook/useWindowSize";
+import { AuthProvider } from "./context/authContext";
+
+
 
 function App() {
   const { width } = useWindowSize();
@@ -17,15 +20,18 @@ function App() {
             clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
           >
             <Box marginBottom={width <= 600 && "60px"}>
-              <Routes>
-                {routes.map((route, index) => (
-                  <Route key={index} {...route}>
-                    {route.routes?.map((route, index) => (
-                      <Route key={index} {...route} />
-                    ))}
-                  </Route>
-                ))}
-              </Routes>
+              <AuthProvider>
+                <Routes>
+                  {routes.map((route, index) => (
+                    <Route key={index} {...route}>
+                      {route.routes?.map((route, index) => (
+                        <Route key={index} {...route} />
+                      ))}
+                    </Route>
+                  ))}
+
+                </Routes>
+              </AuthProvider>
             </Box>
           </GoogleOAuthProvider>
         </Suspense>

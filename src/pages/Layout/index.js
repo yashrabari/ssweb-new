@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Column, Page, Sidebar } from "../../components/common";
+import { AuthContext } from "../../context/authContext";
 
-export default function index() {
+export default function Index() {
+
   return (
     <Page row>
       <Sidebar />
