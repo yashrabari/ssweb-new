@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
 const SwitchButton = styled.div`
   width: 208.5px;
@@ -9,15 +9,21 @@ const SwitchButton = styled.div`
   justify-content; center;
   align-items; center;
 
-  background: ${props => (props.active ? "#00A652" : "")};
+  background: ${(props) => (props.active ? "#00A652" : "")};
 
   font-family: "TT Commons";
   font-size: 24px;
-  color: ${props => (props.active ? "#fff" : "#00A652")};
+  color: ${(props) => (props.active ? "#fff" : "#00A652")};
 
   cursor: pointer;
 
   transition: all 0.15s;
-`
 
-export default SwitchButton
+  @media (max-width: 600px){
+    height: 50px;
+  }
+
+  
+`;
+
+export default SwitchButton;

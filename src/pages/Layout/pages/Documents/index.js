@@ -210,120 +210,129 @@ export default function Documents() {
           </Row>
         </>
       ) : (
-        <Row justifyContent="space-between">
+        <Box>
           <div>
-            <Box
-              width="100%"
-              height="auto"
-              sx={{ display: "flex", flexWrap: "wrap" }}
-            >
-              {allFolders?.map((item, index) => {
-                return (
-                  <div style={{ position: "relative" }}>
-                    <div
-                      onClick={() =>
-                        navigate(`/home/documents/folder/${item.id}`)
-                      }
-                    >
-                      <FolderContainer
-                        key={index}
-                        width="274px"
-                        height="173px"
-                        flexDirection="column"
-                        justifyContent="flex-start"
-                        alignItems="flex-start"
-                        padding="10px"
-                        margin="10px"
-                        borderRadius="7px"
+            <Box width="100%" height="auto">
+              <Row justifyContent="flex-end">
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginLeft: "auto",
+                  }}
+                >
+                  <Button
+                    width="300px"
+                    height="46px"
+                    color="#00A652"
+                    margin="0"
+                    onClick={() => setOpen(true)}
+                  >
+                    + Create New Folder
+                  </Button>
+                  {/* <Row>
+              <ShareWith />
+            </Row> */}
+                </div>
+              </Row>
+              <Box
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    width < 600 ? "repeat(2,1fr)" : "repeat(3,1fr)",
+                  gridGap: "1rem",
+                }}
+              >
+                {allFolders?.map((item, index) => {
+                  return (
+                    <div style={{ position: "relative", marginTop: "20px" }}>
+                      <div
+                        onClick={() =>
+                          navigate(`/home/documents/folder/${item.id}`)
+                        }
                       >
-                        <div
-                          style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "space-between",
-                          }}
+                        <FolderContainer
+                          key={index}
+                          width="100%"
+                          height="173px"
+                          flexDirection="column"
+                          justifyContent="flex-start"
+                          alignItems="flex-start"
+                          padding="10px"
+                          borderRadius="7px"
                         >
                           <div
                             style={{
-                              width: "40px",
-                              height: "40px",
-                              borderRadius: "50%",
-                              backgroundColor: "#ffeeea",
+                              width: "100%",
+                              display: "flex",
+                              justifyContent: "space-between",
                             }}
                           >
-                            <img
-                              width="20px"
-                              height="20px"
-                              src={folder}
+                            <div
                               style={{
-                                paddingTop: "10px",
-                                paddingLeft: "10px",
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "50%",
+                                backgroundColor: "#ffeeea",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                               }}
-                            />
+                            >
+                              <img width="14px" height="14px" src={folder} />
+                            </div>
                           </div>
-                        </div>
-                        <Title
-                          fontSize="22px"
-                          margin="20px 0px 0px 3px"
-                          lineHeight="38px"
-                          fontWeight="600"
-                          fontFamily="TT Commons"
-                        >
-                          {item.name}
-                        </Title>
-                        <Paragraph fontSize="16px" margin="10px 0px 0px 3px">
-                          {item.files.length} file
-                        </Paragraph>{" "}
-                      </FolderContainer>
+                          <Title
+                            fontSize="22px"
+                            margin={
+                              width > 600
+                                ? "20px 0px 0px 3px"
+                                : "8px 0px 0px 3px"
+                            }
+                            lineHeight="38px"
+                            fontWeight="600"
+                            fontFamily="TT Commons"
+                          >
+                            {item.name}
+                          </Title>
+                          <Paragraph fontSize="16px" margin="10px 0px 0px 3px">
+                            {item.files.length} file
+                          </Paragraph>{" "}
+                        </FolderContainer>
+                      </div>
+                      <OptionsMenu
+                        color="rgba(0, 0, 0, 0.4)"
+                        orientation="horizontal"
+                        options={[
+                          {
+                            text: "Open",
+                            onClick: () => {
+                              navigate(`/home/documents/folder/${item.id}`);
+                            },
+                          },
+                          {
+                            text: "Rename",
+                            onClick: () => {
+                              renameFolder(item);
+                            },
+                          },
+                          {
+                            text: "Delete",
+                            onClick: () => {
+                              deleteFolder(item.id);
+                            },
+                          },
+                          { text: "Make a Copy", onClick: () => {} },
+                        ]}
+                        position="absolute"
+                      />
                     </div>
-                    <OptionsMenu
-                      color="rgba(0, 0, 0, 0.4)"
-                      orientation="horizontal"
-                      options={[
-                        {
-                          text: "Open",
-                          onClick: () => {
-                            navigate(`/home/documents/folder/${item.id}`);
-                          },
-                        },
-                        {
-                          text: "Rename",
-                          onClick: () => {
-                            renameFolder(item);
-                          },
-                        },
-                        {
-                          text: "Delete",
-                          onClick: () => {
-                            deleteFolder(item.id);
-                          },
-                        },
-                        { text: "Make a Copy", onClick: () => {} },
-                      ]}
-                      position="absolute"
-                    />
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </Box>
             </Box>
           </div>
-          <Row justifyContent="flex-end">
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <Button
-                width="300px"
-                height="46px"
-                color="#00A652"
-                margin="0"
-                onClick={() => setOpen(true)}
-              >
-                + Create New Folder
-              </Button>
-              {/* <Row>
-              <ShareWith />
-            </Row> */}
-            </div>
-          </Row>
-        </Row>
+        </Box>
       )}
       <Modal
         open={open}

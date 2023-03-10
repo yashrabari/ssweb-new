@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
 const Switch = styled.div`
   width: 421px;
@@ -10,7 +10,12 @@ const Switch = styled.div`
   align-items: center;
   border-radius: 50px;
   background: #00a6520d;
-  margin: 31px auto 44px;
-`
+  margin: 0 0 30px 0;
 
-export default Switch
+  @media (max-width: 600px) {
+    max-width: 250px;
+    height: 50px;
+  }
+`;
+
+export default Switch;

@@ -73,7 +73,7 @@ const Section = styled.section`
   }
 
   @media (max-width: 600px) {
-    grid-template-columns: repeat(1, auto);
+    display: block;
     padding: 14px 30px;
   }
 `;
@@ -85,21 +85,12 @@ export default function BottomSection() {
     <Section>
       {/* <Rectangle1 />
       <Rectangle2 /> */}
-      <div width="100%">
+      <div>
         <Row link alignItems="center" margin="0 0 14px 0">
           <Logo />
           <Brand>S & S Vault</Brand>
         </Row>
-        <Paragraph
-          color="#000"
-          fontSize="14px"
-          // width="262px"
-          textAlign="start"
-          margin="0 0 12px 0"
-        >
-          It is a long established fact that a reader will be distracted by the
-          readable content of a page when looking at its layout.
-        </Paragraph>
+
         <Paragraph
           link
           color="#000"
@@ -108,7 +99,7 @@ export default function BottomSection() {
           textAlign="start"
           margin="0 0 17px 0"
         >
-          Get the app!
+          Our App is Coming Soon !
         </Paragraph>
         <Row margin="12px 0 12px 0">
           <Image

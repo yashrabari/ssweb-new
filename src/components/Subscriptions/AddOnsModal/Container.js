@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
 const Container = styled.div`
   width: 960px;
@@ -9,6 +9,6 @@ const Container = styled.div`
   align-items: start;
   margin: 16px 0;
   padding: 20px;
-`
+`;
 
-export default Container
+export default Container;

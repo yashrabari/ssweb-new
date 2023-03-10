@@ -5,6 +5,7 @@ import { Plan, Switch, SwitchButton } from "../../components/Subscriptions";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { useGetSubscriptionsAndPackagesQuery } from "../../store/slice/api";
 import { useSelector } from "react-redux";
+import useWindowSize from "../../utils/hook/useWindowSize";
 
 export default function Subscriptions() {
   const [monthly, setMonthly] = useState(true);
@@ -105,9 +106,19 @@ export default function Subscriptions() {
     }
   }, [user]);
 
+  const { width } = useWindowSize();
+
   return (
     <Page justifyContent="flex-start">
-      <Container width="1227px" margin="69px auto" justifyContent="flex-start">
+      <Container
+        width="80%"
+        margin="29px auto"
+        style={{
+          padding: width < 1150 && "0px 70px",
+          flexDirection: width < 1150 && "column",
+        }}
+        justifyContent="flex-start"
+      >
         <Title fontWeight="700" margin="46px auto">
           Subscription & Packages
         </Title>
@@ -139,7 +150,10 @@ export default function Subscriptions() {
               </SwitchButton>
             </Switch>
 
-            <Row justifyContent="space-between" width="1005px">
+            <Row
+              justifyContent="space-between"
+              style={{ flexDirection: width < 1000 && "column" }}
+            >
               {packages.map((plan, index) => (
                 <Plan
                   key={index}

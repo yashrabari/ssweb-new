@@ -26,7 +26,7 @@ const Column = styled.div`
   @media (max-width: 800px) {
     width: 73%;
   }
-  @media (max-width: 500px) {
+  @media (max-width: 600px) {
     width: 90%;
     margin: 0 10px;
   }

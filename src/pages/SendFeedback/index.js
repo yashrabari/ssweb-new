@@ -20,6 +20,8 @@ import Group86 from "../../assets/images/Group 86.png";
 import NotePencil from "../../assets/images/NotePencil.png";
 import { MdKeyboardBackspace } from "react-icons/md";
 import TextArea from "../../components/common/TextArea";
+import useWindowSize from "../../utils/hook/useWindowSize";
+import { Box } from "@mui/material";
 
 const Index = () => {
   const [title, setTitle] = useState("");
@@ -45,9 +47,12 @@ const Index = () => {
     }
   };
 
+  const { width } = useWindowSize();
+
   return (
     <>
-      <Row
+      <Box
+        display="flex"
         height="73px"
         padding="24px"
         alignItems="center"
@@ -59,11 +64,16 @@ const Index = () => {
             onClick={() => navigate(-1)}
             size={25}
           />
-          <Title fontWeight="650" margin="0px 0px 0px 40px">
+          <Title
+            fontWeight="650"
+            margin={width < 600 ? "0px 0px 0px 20px" : "0px 0px 0px 40px"}
+          >
             Send Feedback
           </Title>
         </Row>
-        <Row>
+        <div
+          style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}
+        >
           <OptionMenuSettings
             options={[
               {
@@ -105,9 +115,9 @@ const Index = () => {
           >
             <IoNotificationsOutline size={20} />
           </IconButton>
-          <Profile user={user} />
-        </Row>
-      </Row>
+          {/* <Profile user={user} /> */}
+        </div>
+      </Box>
       <div style={{ padding: "0px 40px" }}>
         <Row
           alignItems="center"
@@ -137,7 +147,7 @@ const Index = () => {
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "flex-start",
             width: "849px",
             marginTop: "10px",
           }}

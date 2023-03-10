@@ -1,27 +1,31 @@
-import React from "react"
-import { useState } from "react"
-import { Button, Column, Paragraph, Row, Title } from "../../common"
-import Container from "./Container"
-import SelectContainer from "./SelectContainer"
+import React from "react";
+import { useState } from "react";
+import { Button, Column, Paragraph, Row, Title } from "../../common";
+import Container from "./Container";
+import SelectContainer from "./SelectContainer";
 
 export default function AddOnsModal({ videos, storages, buy }) {
-  const [selectedStorage, setSelectedStorage] = useState()
-  const [selectedVideo, setSelectedVideo] = useState()
+  const [selectedStorage, setSelectedStorage] = useState();
+  const [selectedVideo, setSelectedVideo] = useState();
 
   const buyAddon = () => {
     buy({
-      storage: selectedStorage ? {
-        id: selectedStorage.id,
-        currency: selectedStorage.currency,
-        unit_amount: selectedStorage.unit_amount,
-      } : null,
-      video: selectedVideo ? {
-        id: selectedVideo.id,
-        currency: selectedVideo.currency,
-        unit_amount: selectedVideo.unit_amount,
-      } : null
-    })
-  }
+      storage: selectedStorage
+        ? {
+            id: selectedStorage.id,
+            currency: selectedStorage.currency,
+            unit_amount: selectedStorage.unit_amount,
+          }
+        : null,
+      video: selectedVideo
+        ? {
+            id: selectedVideo.id,
+            currency: selectedVideo.currency,
+            unit_amount: selectedVideo.unit_amount,
+          }
+        : null,
+    });
+  };
 
   return (
     <Column width="100%" justifyContent="space-between" alignItems="center">
@@ -73,7 +77,11 @@ export default function AddOnsModal({ videos, storages, buy }) {
               selected={selectedVideo?.id === video.id}
               title={`${video.nickname} /Day`}
               price={`${video.currency}${video.unit_amount}`}
-              features={["Lorem Ipsum", "Lorem Ipsum dolor", "Lorem Ipsum is dummy"]}
+              features={[
+                "Lorem Ipsum",
+                "Lorem Ipsum dolor",
+                "Lorem Ipsum is dummy",
+              ]}
               onClick={() => setSelectedVideo(video)}
             />
           ))}
@@ -86,5 +94,5 @@ export default function AddOnsModal({ videos, storages, buy }) {
         </Button>
       </Row>
     </Column>
-  )
+  );
 }
